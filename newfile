@@ -1,1 +1,78 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Using leaflet choropleth plugin</title>
+<script src='https://api.mapbox.com/mapbox.js/v2.2.1/mapbox.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/v2.2.1/mapbox.css' rel='stylesheet' />
+<script src="https://cdn.rawgit.com/mayotunde/choropleth/gh-pages/dist/choropleth.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+</head>
+<body>
+<style>
+ .legend label,
+.legend span {
+  display:block;
+  float: left;
+  height:15px;
+  width:30%;
+  margin-right:5px;
+  border: 1px solid #fff;
+        }
+</style>
+<div id='legend' style='display:none;'>
+  <strong>Human Population</strong>
+	<ul class= 'legend labels'>
+   <span style='background:  #31a354;'></span>>5M<br>
+    <span style='background:#74c476;'></span>>3M<br>
+      <span style='background:#addd8e;'></span>>1.5M<br>
+    		</ul>
+        <div class='legend-source'>Source: <a href="www.mapsnigeriainitiative.wordpress.com">mapsnigeriainitiative</a></div>
+</div>
 
+<div id="map" style="width: 700px;height: 500px"></div>
+
+<script>
+
+L.mapbox.accessToken = 'pk.eyJ1IjoibWF5b3R1bmRlIiwiYSI6IlpFM1Jmck0ifQ.13TB14FKWB328q1q7eEZUQ';
+
+$.getJSON('https://cdn.rawgit.com/mayotunde/choropleth/gh-pages/population.geojson', function(data) {
+ var len =  L.choropleth(data, {
+    valueProperty: 'census_Tot', 
+    scale: ['#addd8e', '#74c476', '#31a354'], 
+    steps: 3, 
+    mode: 'q', 
+    style: {
+        color: '#000', 
+        weight: 2,
+        fillOpacity: 0.6
+    },
+onEachFeature: function(feature, layer) {
+layer.bindPopup(feature.properties.census_Nam)
+    }
+}).addTo(map)
+
+
+len.on('mouseover', function(e) {
+e.layer.setStyle({color:'white', weight: 5});
+e.layer.openPopup();
+}).on('mouseout', function(e) {
+e.layer.setStyle({color:'black', weight: 2});
+});
+});
+
+
+  var map = L.mapbox.map('map', 'mapbox.dark').setView([9.00, 8.00], 6);
+
+   
+
+map.legendControl.addLegend(document.getElementById('legend').innerHTML);
+
+
+map.fitBounds(len, getBounds());
+
+
+
+</script>
+</body>
+</html>
